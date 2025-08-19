@@ -1,7 +1,29 @@
 services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: app
+      POSTGRES_DB: appdb
+    ports: ["5432:5432"]
+    volumes: [ "pgdata:/var/lib/postgresql/data" ]
+
+  adminer:
+    image: adminer:4
+    ports: ["8080:8080"]
+    depends_on: [db]
+
   pyapi:
     build: ./services/pyapi
     ports: ["8000:8000"]
+    environment:
+      DATABASE_URL: postgresql+asyncpg://app:app@db:5432/appdb
+    depends_on: [db]
+
   tsapi:
     build: ./services/tsapi
     ports: ["3000:3000"]
+    depends_on: [pyapi]
+
+volumes:
+  pgdata:
