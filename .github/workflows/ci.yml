@@ -1,0 +1,23 @@
+name: ci
+on: [push, pull_request]
+jobs:
+  pyapi:
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: services/pyapi } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - run: python -m pip install -r requirements.txt
+      - run: pytest -q
+      - run: docker build -t pyapi:ci .
+  tsapi:
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: services/tsapi } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20' }
+      - run: npm ci
+      - run: npm test
+      - run: docker build -t tsapi:ci .

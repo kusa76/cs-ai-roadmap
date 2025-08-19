@@ -1,0 +1,7 @@
+services:
+  pyapi:
+    build: ./services/pyapi
+    ports: ["8000:8000"]
+  tsapi:
+    build: ./services/tsapi
+    ports: ["3000:3000"]
