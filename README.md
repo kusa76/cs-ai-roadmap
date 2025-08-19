@@ -91,3 +91,7 @@ This repo is part of a guided AI-assisted Computer Science roadmap. Each lesson 
 ### Lesson 4B — Sessions (phase 2 fixed)
 - Corrected Alembic revision chain (down_revision=46f44abc8785) and applied FK migration.
 - `messages.user_id → users.id (SET NULL)`, `messages.session_id → sessions.id (CASCADE)`, `session_id` NOT NULL.
+
+### Lesson 4C — Sessions API
+- Added /sessions router (POST create, GET list).
+- Prepares wiring messages → sessions in API.
