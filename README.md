@@ -99,3 +99,7 @@ This repo is part of a guided AI-assisted Computer Science roadmap. Each lesson 
 ### Lesson 4C — Sessions API (fix)
 - Router made self-contained (falls back to local async engine from `DATABASE_URL` if app.db dep missing).
 - Verified: POST /sessions, GET /sessions.
+"n""n"
+### Lesson 4D — Messages ↔ Sessions/Users (API layer)
+- /messages POST requires session_id (FK), optional user_id; both validated.
+- Auto-detects messages text column; /messages GET returns a consistent shape.
