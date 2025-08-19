@@ -74,3 +74,10 @@ This repo is part of a guided AI-assisted Computer Science roadmap. Each lesson 
 ### Lesson 3C — DELETE /users/{id}
 - **204 No Content** when a user is deleted
 - **404** when the user does not exist
+
+### Lesson 4A — Messages scaffold
+- Added `messages` table (id, text, created_at) via Alembic.
+- Endpoints:
+  - `POST /messages` with Pydantic validation.
+  - `GET /messages` returns list.
+- Sets stage for chat/MUD/automation streams (WebSocket next).
