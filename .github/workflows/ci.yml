@@ -1,18 +1,27 @@
 name: CI
 
 on:
-  push:
-    branches: ["main"]
-  pull_request:
+  push:            # run on any branch push
+    branches: ["**"]
+  pull_request:    # PRs too
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  # Always-run sanity check so the workflow never ends with "no jobs were run"
-  noop:
+  # Always runs so the workflow never ends with "no jobs were run"
+  quickcheck:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "CI triggered for ${{ github.sha }}"
+      - uses: actions/checkout@v4
+      - run: |
+          echo "CI for ${{ github.repository }} @ ${{ github.sha }}"
+          echo "Branch: ${{ github.ref }}"
+          echo "Changed files:"; git diff --name-only HEAD~1 || true
 
-  # Backend (FastAPI) — only if services/pyapi exists
+  # Backend (FastAPI) — only if pyapi exists
   pyapi:
     if: ${{ hashFiles('services/pyapi/requirements.txt') != '' }}
     runs-on: ubuntu-latest
@@ -20,7 +29,6 @@ jobs:
       run:
         working-directory: services/pyapi
     env:
-      # Use in-memory SQLite for quick import checks
       DATABASE_URL: sqlite+aiosqlite:///:memory:
       PYTHONUNBUFFERED: "1"
     steps:
@@ -35,15 +43,13 @@ jobs:
         run: |
           python - <<'PY'
           import fastapi, sqlalchemy
-          import sys
           print("fastapi", fastapi.__version__)
           print("sqlalchemy", sqlalchemy.__version__)
-          sys.exit(0)
           PY
       - name: Build container
         run: docker build -t pyapi:ci .
 
-  # Frontend (web) — only if web/package.json exists
+  # Frontend (web) — only if web exists
   web:
     if: ${{ hashFiles('web/package.json') != '' }}
     runs-on: ubuntu-latest
@@ -60,11 +66,10 @@ jobs:
       - name: Install
         run: |
           if [ -f package-lock.json ]; then npm ci; else npm install; fi
-      - name: Typecheck & Build
-        run: |
-          npm run -s build
+      - name: Build
+        run: npm run -s build
 
-  # Optional Typescript service — only if services/tsapi exists
+  # Optional tsapi — only if present
   tsapi:
     if: ${{ hashFiles('services/tsapi/package.json') != '' }}
     runs-on: ubuntu-latest
