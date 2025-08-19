@@ -127,3 +127,27 @@ This repo is part of a guided AI-assisted Computer Science roadmap. Each lesson 
 - Ordering: order=asc|desc on created_at
 
 - Response: {items[], total, limit, offset}
+
+# cs-ai-roadmap — Checkpoint (2025‑08‑19)
+
+Modern dev baseline is live:
+
+- **Backend:** FastAPI + Postgres (Docker). Health: `GET /health`. Messages: `GET /messages/paged?limit&offset&order`.
+- **Frontend:** Vite + React + @tanstack/react-query + Tailwind CSS v4 (local, no CDN).
+- **Proxy:** Vite proxies `/messages` → `http://localhost:8000`.
+
+## Run (dev)
+- Backend: `sudo docker compose up -d db pyapi`  → Health: http://localhost:8000/health  
+- Frontend: in `web/` → `npm run dev` → http://localhost:5173
+
+## UI
+- Messages list with paging + order toggle (newest/oldest).
+- Tailwind styling (v4 via `@tailwindcss/postcss`).
+
+## Endpoints
+- `GET /messages/paged?limit=10&offset=0&order=desc` → `{ items, total, limit, offset }`
+
+## Notes
+- Frontend code: `web/src/*` (see `api.ts`, `App.tsx`, `main.tsx`, `index.css`).
+- PostCSS config: `web/postcss.config.cjs`.
+
