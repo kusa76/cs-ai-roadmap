@@ -103,4 +103,4 @@ This repo is part of a guided AI-assisted Computer Science roadmap. Each lesson 
 ### Lesson 4D — Messages ↔ Sessions/Users (API layer)
 - /messages POST requires session_id (FK), optional user_id; both validated.
 - Auto-detects messages text column; /messages GET returns a consistent shape.
-- 2025-08-19: Quote info_schema table_name in messages router; switch tests to JSON bodies; avoid UID var (readonly).\n
+- 2025-08-19: Quote info_schema table_name in messages router; switch tests to JSON bodies; avoid UID var (readonly).\n- 2025-08-19: Remove information_schema autodetect in /messages; hardcode txt_col='text' for stability.\n
