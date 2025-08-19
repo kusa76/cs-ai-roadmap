@@ -65,3 +65,12 @@ This repo is part of a guided AI-assisted Computer Science roadmap. Each lesson 
   - `python -m alembic revision --autogenerate -m "msg"`
   - `python -m alembic upgrade head`
 - Models live in `app/models.py` and are imported in `migrations/env.py` to enable autogenerate.
+
+
+### Lesson 3B — Error handling
+- `GET /users/{id}` returns 404 when not found.
+
+
+### Lesson 3C — DELETE /users/{id}
+- **204 No Content** when a user is deleted
+- **404** when the user does not exist
