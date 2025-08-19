@@ -95,3 +95,7 @@ This repo is part of a guided AI-assisted Computer Science roadmap. Each lesson 
 ### Lesson 4C — Sessions API
 - Added /sessions router (POST create, GET list).
 - Prepares wiring messages → sessions in API.
+
+### Lesson 4C — Sessions API (fix)
+- Router made self-contained (falls back to local async engine from `DATABASE_URL` if app.db dep missing).
+- Verified: POST /sessions, GET /sessions.
