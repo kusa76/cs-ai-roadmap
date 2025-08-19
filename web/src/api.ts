@@ -32,3 +32,9 @@ export async function listMessages(params: QueryParams = {}): Promise<PagedMessa
   return PagedMessages.parse(res.data)
 }
 
+export async function createMessage(payload: { text: string; session_id?: number; user_id?: number | null }): Promise<MessageOut> {
+  const res = await axios.post('/messages', payload);
+  return MessageOut.parse(res.data);
+}
+
+
