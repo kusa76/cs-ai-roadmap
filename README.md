@@ -57,3 +57,11 @@ This repo is part of a guided AI-assisted Computer Science roadmap. Each lesson 
 - ✅ Fixed missing deps by updating services/pyapi/requirements.txt (added SQLAlchemy, asyncpg)
 - ✅ Standardized terminal→clipboard workflow using xclip alias cpc
 - ✅ Standardized one-liners: { …; …; } 2>&1 | tee /dev/tty | cpc (show + copy)
+
+
+### Lesson 2B — Alembic (async) quick notes
+- DSN set via `alembic.ini` and `app/db.py` → `postgresql+asyncpg://<user>:<pass>@db:5432/<db>`
+- Commands:
+  - `python -m alembic revision --autogenerate -m "msg"`
+  - `python -m alembic upgrade head`
+- Models live in `app/models.py` and are imported in `migrations/env.py` to enable autogenerate.
