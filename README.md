@@ -47,15 +47,18 @@ Start services:
 
 ```bash
 docker compose up -d
+```
 
 Health checks:
 ```bash
 curl -s http://localhost:8000/health
 curl -s http://localhost:3000/health
+```
 
 Stop services:
 ```bash
 docker compose down
+```
 
 Contributing
 
