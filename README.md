@@ -119,3 +119,11 @@ This repo is part of a guided AI-assisted Computer Science roadmap. Each lesson 
 - Ordering via `order=asc|desc` on `created_at`
 
 - Pagination metadata: `{items, total, limit, offset}`
+
+### Lesson 5A – Advanced /messages/paged
+
+- Filters: user_id, session_id, since, until
+
+- Ordering: order=asc|desc on created_at
+
+- Response: {items[], total, limit, offset}
