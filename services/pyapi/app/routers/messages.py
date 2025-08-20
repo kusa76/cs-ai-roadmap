@@ -1,13 +1,15 @@
 import os
 from typing import Optional, List
-from fastapi import APIRouter, Depends
-from pydantic import BaseModel
+from datetime import datetime
+
+from fastapi import APIRouter, Depends, HTTPException, status
+from pydantic import BaseModel, Field
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 
-router = APIRouter(prefix="/messages")
+router = APIRouter(prefix="/messages", tags=["messages"])
 
-# --- DB session (Postgres via env DATABASE_URL) ---
+# --- DB session (async) ---
 DATABASE_URL = os.getenv(
     "DATABASE_URL",
     "postgresql+asyncpg://postgres:postgres@db:5432/postgres",
@@ -19,13 +21,13 @@ async def get_session() -> AsyncSession:
     async with SessionLocal() as session:
         yield session
 
-# --- Schemas (align with frontend) ---
+# --- Schemas ---
 class MessageOut(BaseModel):
     id: int
     text: Optional[str]
     session_id: int
     user_id: Optional[int]
-    created_at: str
+    created_at: datetime  # <— changed from str to datetime
 
 class PagedMessages(BaseModel):
     items: List[MessageOut]
@@ -33,38 +35,72 @@ class PagedMessages(BaseModel):
     limit: int
     offset: int
 
+class MessageCreate(BaseModel):
+    text: str = Field(..., min_length=1)
+    session_id: int
+    user_id: Optional[int] = None
+
+class MessageUpdate(BaseModel):
+    text: str = Field(..., min_length=1)
+
 # --- Routes ---
-@router.get("", response_model=PagedMessages)
-async def list_messages(
+@router.get("/paged", response_model=PagedMessages)
+async def list_paged(
     limit: int = 10,
     offset: int = 0,
     order: str = "desc",
     session: AsyncSession = Depends(get_session),
 ):
-    order_sql = "DESC" if order.lower() != "asc" else "ASC"
+    order = order.lower()
+    if order not in ("asc", "desc"):
+        raise HTTPException(status_code=400, detail="order must be asc or desc")
 
-    # total count
-    res_total = await session.execute(text("SELECT COUNT(*) FROM messages"))
-    total = int(res_total.scalar() or 0)
+    # total
+    res = await session.execute(text("SELECT COUNT(*) FROM public.messages"))
+    total = int(res.scalar_one())
 
-    # page query
-    res = await session.execute(
-        text(
-            f"""
-            SELECT
-              id,
-              text,
-              session_id,
-              user_id,
-              to_char(created_at, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"') AS created_at
-            FROM messages
-            ORDER BY id {order_sql}
-            LIMIT :limit OFFSET :offset
-            """
-        ),
-        {"limit": limit, "offset": offset},
-    )
-    items = [MessageOut(**dict(r._mapping)) for r in res.fetchall()]
-
+    # items
+    q = text(f"""
+        SELECT id, "text" AS text, session_id, user_id, created_at
+        FROM public.messages
+        ORDER BY created_at {order}
+        LIMIT :limit OFFSET :offset
+    """)
+    res = await session.execute(q, {"limit": limit, "offset": offset})
+    rows = res.mappings().all()
+    items = [MessageOut(**dict(r)) for r in rows]
     return PagedMessages(items=items, total=total, limit=limit, offset=offset)
+
+@router.post("", response_model=MessageOut, status_code=status.HTTP_201_CREATED)
+async def create_message(body: MessageCreate, session: AsyncSession = Depends(get_session)):
+    q = text("""
+        INSERT INTO public.messages ("text", session_id, user_id)
+        VALUES (:text, :sid, :uid)
+        RETURNING id, "text" AS text, session_id, user_id, created_at
+    """)
+    res = await session.execute(q, {"text": body.text, "sid": body.session_id, "uid": body.user_id})
+    row = res.mappings().first()
+    await session.commit()
+    if not row:
+        raise HTTPException(status_code=500, detail="insert failed")
+    return MessageOut(**dict(row))
+
+@router.patch("/{message_id}", response_model=MessageOut)
+async def update_message(message_id: int, body: MessageUpdate, session: AsyncSession = Depends(get_session)):
+    q = text("""
+        UPDATE public.messages SET "text" = :text
+        WHERE id = :id
+        RETURNING id, "text" AS text, session_id, user_id, created_at
+    """)
+    res = await session.execute(q, {"text": body.text, "id": message_id})
+    row = res.mappings().first()
+    await session.commit()
+    if not row:
+        raise HTTPException(status_code=404, detail="message not found")
+    return MessageOut(**dict(row))
+
+@router.delete("/{message_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_message(message_id: int, session: AsyncSession = Depends(get_session)):
+    await session.execute(text("DELETE FROM public.messages WHERE id = :id"), {"id": message_id})
+    await session.commit()
 
