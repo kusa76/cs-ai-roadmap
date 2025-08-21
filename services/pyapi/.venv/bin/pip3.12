@@ -1,4 +1,4 @@
-#!/home/kusa/cs-ai-roadmap/services/pyapi/.venv/bin/python3
+#!/home/kusa/cs-ai-roadmap/services/pyapi/.venv/bin/python
 # -*- coding: utf-8 -*-
 import re
 import sys

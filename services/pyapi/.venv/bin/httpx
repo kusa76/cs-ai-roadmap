@@ -1,4 +1,4 @@
-#!/home/kusa/cs-ai-roadmap/services/pyapi/.venv/bin/python3
+#!/home/kusa/cs-ai-roadmap/services/pyapi/.venv/bin/python
 import sys
 from httpx import main
 if __name__ == '__main__':
