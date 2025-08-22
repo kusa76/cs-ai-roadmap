@@ -4,9 +4,9 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   test: {
-    globals: true,           // ✅ this enables describe/it/expect
     environment: 'jsdom',
     setupFiles: './src/setupTests.ts',
+    globals: true,
     include: ['src/**/*.{test,spec}.{ts,tsx}'],
     css: true,
   },
