@@ -7,7 +7,7 @@ describe('MessageForm', () => {
     const user = userEvent.setup()
     const onCreate = vi.fn()
 
-    render(<MessageForm onCreate={onCreate} />)
+    render(<MessageForm onCreate={onCreate} isSaving={false} />)
 
     const input = screen.getByRole('textbox')
     await user.type(input, 'hello world')

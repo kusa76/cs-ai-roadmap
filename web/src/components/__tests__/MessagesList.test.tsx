@@ -11,8 +11,15 @@ describe('MessagesList', () => {
     render(
       <MessagesList
         data={{ items, total: 2, limit: 10, offset: 0 }}
+        isPending={false}
+        isError={false}
+        error={null}
+        limit={10}
+        offset={0}
+        isSaving={false}
+        isDeleting={false}
+        onSave={() => {}}
         onDelete={() => {}}
-        onEdit={() => {}}
       />
     )
 

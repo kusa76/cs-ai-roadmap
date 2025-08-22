@@ -3,6 +3,7 @@ import { listMessages, createMessage, patchMessage, deleteMessage } from './api'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useMemo, useState } from 'react'
 import { MessageForm, MessagesControls, MessagesList } from './components'
+import type { CreatePayload } from './components/MessageForm'
 
 
 type Order = 'asc' | 'desc'

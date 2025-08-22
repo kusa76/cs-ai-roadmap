@@ -13,8 +13,8 @@ describe('MessagesControls', () => {
       <MessagesControls
         order="desc"
         page={0}
-        total={2}
         limit={10}
+        maxPage={1}
         setOrder={setOrder}
         setPage={setPage}
         setLimit={setLimit}
